@@ -4,7 +4,7 @@ import axios from 'axios';
 import {useState, useEffect} from "react";
 import StorageIcon from '@mui/icons-material/Storage';
 import './App.css';
-import {LoadingButton} from "@mui/lab";
+import Tabs from "./Tabs/Tabs";
 const APP_ID = '387900606919443';
 function App() {
 
@@ -32,10 +32,16 @@ function App() {
 
     const [isLoading, setIsLoading] = useState(false);
     const [isArchiving, setIsArchiving] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
+
 
     function handleChange(event) {
         setHashtag(event.target.value);
     }
+
+    const handleDialogClose = () => {
+        setSelectedItem(null);
+    };
 
     const archiveFacebookData = async () => {
         setIsArchiving(true);
@@ -74,7 +80,7 @@ function App() {
                             const { image } = media;
                             url = image.src;
                         }
-                        posts = posts.concat(`<tr style="border:solid border-color: black border-width: 5px 0 vertical-align: top"><td style="vertical-align: top">${new Date(doc.created_time).toLocaleDateString()}</td><td><img src="${url}" width="100" height="100" /></td><td style="vertical-align: top">${doc.message}</td></tr>`)
+                        posts = posts.concat(`<tr><td style="vertical-align: top"><input type="checkbox" id="${doc._id}" value="Bike"></td><td style="vertical-align: top">${new Date(doc.created_time).toLocaleDateString()}</td><td><img src="${url}" width="100" height="100" /></td><td style="vertical-align: top">${doc.message}</td></tr>`)
                     });
 
                     posts.concat('</tbody></table></div>');
@@ -137,7 +143,7 @@ function App() {
                   <label style={{margin : 10, color: 'darkgreen'}} htmlFor="hashtag-filter">Hashtag Filter: #</label>
                   <input type='text' id='hashtag-filter' onChange={handleChange} />
                   <label style={{margin : 10, color: 'darkgreen'}} htmlFor="years">Oldest:</label>
-                  <select name="years" id="years" style={{width: 55}}>
+                  <select name="years" id="years" style={{width: 55}} defaultValue={2023}>
                       <option value="2013">2013</option>
                       <option value="2014">2014</option>
                       <option value="2015">2015</option>
@@ -148,7 +154,7 @@ function App() {
                       <option value="2020">2020</option>
                       <option value="2021">2021</option>
                       <option value="2022">2022</option>
-                      <option selected="selected" value="2023">2023</option>
+                      <option value="2023">2023</option>
                       <option value="2024">2024</option>
                   </select>
                   <button style={{marginLeft : 30, marginTop: 30, color: 'darkgreen'}} onClick={archiveFacebookData}>
