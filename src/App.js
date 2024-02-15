@@ -43,6 +43,13 @@ function App() {
         setSelectedItem(null);
     };
 
+    const cropText = (text) => {
+        if( text.length > 400){
+            return `${text.slice(0, 400)}<b>...</b>`;
+        }
+        return text;
+    }
+
     const archiveFacebookData = async () => {
         setIsArchiving(true);
         const { id: userId, accessToken: userAccessToken } = profile;
@@ -71,16 +78,9 @@ function App() {
                 .then(res => {
                     let posts = `<h3>${res.data.length} Results for "#${hashtag}"</h3><hr width="100%" color="green" size="2px" /><div style="overflow-y:scroll; height:400px"><table><tbody>`
                     res.data.forEach((doc) => {
-                        let url = './logo.svg';
-                        const allMedia = doc.attachments;
-                        if(allMedia){
-                            const { data } = allMedia;
-                            const firstMedia = data[0];
-                            const { media } = firstMedia;
-                            const { image } = media;
-                            url = image.src;
-                        }
-                        posts = posts.concat(`<tr><td style="vertical-align: top"><input type="checkbox" id="${doc._id}" value="Bike"></td><td style="vertical-align: top">${new Date(doc.created_time).toLocaleDateString()}</td><td><img src="${url}" width="100" height="100" /></td><td style="vertical-align: top">${doc.message}</td></tr>`)
+
+                        const url = `https://s3.us-west-1.amazonaws.com/bronze-giant-social-archive/${doc._id}.jpg`;
+                        posts = posts.concat(`<tr><td style="vertical-align: top"><a href="https://www.facebook.com/${doc._id}" target="_blank"><img alt="Facebook" src="facebook-16x16-icon.png" width="20" height="20" /></a></td><td style="vertical-align: top"><td style="vertical-align: top">${new Date(doc.created_time).toLocaleDateString()}</td><td style="vertical-align: top"><input type="checkbox" id="${doc._id}" value="Bike"/></td><td><img alt="" src="${url}" width="100" height="100" style="vertical-align: top"/></td><td style="vertical-align: top">${cropText(doc.message)}</td></tr>`)
                     });
 
                     posts.concat('</tbody></table></div>');
