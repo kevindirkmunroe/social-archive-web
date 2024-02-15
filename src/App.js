@@ -57,9 +57,9 @@ function App() {
         return 0;
     }
 
-    const COLUMNS = [{name: 'Link', selector: row => row.originalPost, maxWidth: '50px', cell: (data) => <a href={'https://www.facebook.com/' + data.id} target="_blank"><img alt="Facebook" src="facebook-16x16-icon.png" width="20" height="20" /></a>},
+    const COLUMNS = [{name: 'Link', selector: row => row.originalPost, maxWidth: '50px', cell: (data) => <a href={'https://www.facebook.com/' + data.id} target="_blank"><img alt="Facebook" src="./facebook-16x16-icon.png" width="20" height="20" /></a>},
         {name: 'Post Date', selector: row => row.datePosted, sortable: true, sortFunction: dateSort, maxWidth: '150px'},
-        {name: 'Top Image', selector: row => row.image, maxWidth: '200px', cell: (data) => <img alt="" src={'https://s3.us-west-1.amazonaws.com/bronze-giant-social-archive/' + data.id + '.jpg'} width="100" height="100"/> },
+        {name: 'Top Image', selector: row => row.image, maxWidth: '200px', cell: (data) => <img alt="" src={'https://s3.us-west-1.amazonaws.com/bronze-giant-social-archive/' + data.id + '.jpg'} width="100" height="100" style={{marginTop: '3px', borderRadius: '10px'}}/> },
         {name: 'Content', selector: row => row.content, maxWidth: '600px'}];
 
     function handleChange(event) {
@@ -104,33 +104,26 @@ function App() {
             axios.get(`http://localhost:3001/social-archive/facebook/posts?userId=${profile.id}&hashtag=${hashtag}`
                 )
                 .then(res => {
-                    let posts = `<h3>${res.data.length} Results for "#${hashtag}"</h3><hr width="100%" color="green" size="2px" /><div style="overflow-y:scroll; height:600px"><script>function showPost(){ alert('halooo')}</script><table class="hoverTable"><tbody>`
-                    posts = posts.concat(`<tr align="left" style="background-color: #f4f4f4; font-weight: bold; height: 50px;"><td><input type="checkbox" id="select-all" value="Bike"/></td><td>Link</td><td>Post Date</td><td>Top Image</td><td>Content</td></tr>`);
                     res.data.forEach((doc) => {
 
                         const url = `https://s3.us-west-1.amazonaws.com/bronze-giant-social-archive/${doc._id}.jpg`;
-                        posts = posts.concat(`<tr><td style="vertical-align: top;"><input type="checkbox" id="${doc._id}" value="Bike"/></td><td style="vertical-align: top"><a href="https://www.facebook.com/${doc._id}" target="_blank"><img alt="Facebook" src="facebook-16x16-icon.png" width="20" height="20" /></a></td><td style="vertical-align: top">${new Date(doc.created_time).toLocaleDateString()}</td><td><img alt="" src="${url}" width="100" height="100" style="vertical-align: top; border-radius: 5px; margin-right: 10px;"/></td><td style="vertical-align: top">${cropText(doc.message)}</td></tr>`)
                         newPostsData.push({id: doc._id, originalPost: `<a href="https://www.facebook.com/${doc._id}" target="_blank"><img alt="Facebook" src="facebook-16x16-icon.png" width="20" height="20" /></a>`, datePosted: new Date(doc.created_time).toLocaleDateString(), image: url, content: cropText(doc.message)  });
                     });
 
-                    posts.concat('</tbody></table></div>');
-                    document.getElementById('postsView').innerHTML=`<div>${posts}</div>`
                     setIsLoading(false);
                     setPostsData(newPostsData);
                 })
                 .catch((error) => {
                     console.log(`ARCHIVE ERROR: ${JSON.stringify(error)}`);
-                    document.getElementById('postsView').innerHTML=`<div>An error occurred.</div>`
                     setIsLoading(false);
                 });
         }catch(error){
             console.log(`fetch ERROR: ${JSON.stringify(error)}`);
-            document.getElementById('postsView').innerHTML=`<div>An error occurred.</div>`
         }
     }
 
     const clearFacebookData = () => {
-        document.getElementById('postsView').innerHTML=`<div>No Data.</div>`
+        setPostsData([]);
     }
 
   return (
@@ -199,9 +192,9 @@ function App() {
                   </button>
 
               </div>: (<h5 style={{marginLeft: 10, fontStyle: 'italic', color: 'gray'}}>No Profile</h5>)}
-              <div style={{marginLeft: 30, marginRight: 30, marginTop: 20, fontSize: 14}} id='postsView' />
               <PostTableComponent
                   columns={COLUMNS}
+                  hashtag={hashtag}
                   data={postsData}
                   selectableRows
               />
