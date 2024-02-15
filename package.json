@@ -16,11 +16,13 @@
     "axios": "^1.6.3",
     "primereact": "^10.2.1",
     "react": "^18.2.0",
+    "react-data-table-component": "^7.6.2",
     "react-dom": "^18.2.0",
     "react-image-file-resizer": "^0.4.8",
     "react-loader-spinner": "^6.1.6",
     "react-scripts": "5.0.1",
     "react-social-login-buttons": "^3.9.1",
+    "react-table": "^7.8.0",
     "reactjs-social-login": "^2.6.3",
     "web-vitals": "^2.1.4"
   },
