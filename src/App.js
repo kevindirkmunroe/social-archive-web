@@ -59,7 +59,7 @@ function App() {
 
     const COLUMNS = [{name: 'Link', selector: row => row.originalPost, maxWidth: '50px', cell: (data) => <a href={'https://www.facebook.com/' + data.id} target="_blank"><img alt="Facebook" src="facebook-16x16-icon.png" width="20" height="20" /></a>},
         {name: 'Post Date', selector: row => row.datePosted, sortable: true, sortFunction: dateSort, maxWidth: '150px'},
-        {name: 'Top Image', selector: row => row.image, maxWidth: '200px'},
+        {name: 'Top Image', selector: row => row.image, maxWidth: '200px', cell: (data) => <img alt="" src={'https://s3.us-west-1.amazonaws.com/bronze-giant-social-archive/' + data.id + '.jpg'} width="100" height="100"/> },
         {name: 'Content', selector: row => row.content, maxWidth: '600px'}];
 
     function handleChange(event) {
