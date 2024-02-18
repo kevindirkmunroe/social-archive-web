@@ -17,7 +17,7 @@ export function PostTableComponent(props){
                 return (
                     <div style={{width: '500px', height: '700px'}}>
                             <b>{post.id}</b><p/>
-                            {post.datePosted}<p/>
+                            <div style={{fontSize: '10px', fontStyle: 'italic'}}>{post.datePosted}</div><p/>
                             <div style={{backgroundColor: '#f4f4f4', margin: '3px', fontSize: '14px'}}>{post.content}</div>
                             <p/>
                             <img src={`https://s3.us-west-1.amazonaws.com/bronze-giant-social-archive/${post.id}.jpg`} style={{objectFit: 'cover', width: '500px', height: '600px'}}/>

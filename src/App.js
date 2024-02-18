@@ -57,10 +57,10 @@ function App() {
         return 0;
     }
 
-    const COLUMNS = [{name: 'Link', selector: row => row.originalPost, maxWidth: '50px', cell: (data) => <a href={'https://www.facebook.com/' + data.id} target="_blank"><img alt="Facebook" src="./facebook-16x16-icon.png" width="20" height="20" /></a>},
-        {name: 'Post Date', selector: row => row.datePosted, sortable: true, sortFunction: dateSort, maxWidth: '150px'},
-        {name: 'Top Image', selector: row => row.image, maxWidth: '200px', cell: (data) => <img alt="" src={'https://s3.us-west-1.amazonaws.com/bronze-giant-social-archive/' + data.id + '.jpg'} width="100" height="100" style={{marginTop: '3px', borderRadius: '10px'}}/> },
-        {name: 'Content', selector: row => row.content, maxWidth: '600px'}];
+    const COLUMNS = [{name: 'Link', selector: row => row.originalPost, width: '60px', cell: (data) => <a href={'https://www.facebook.com/' + data.id} target="_blank"><img alt="Facebook" src="./facebook-16x16-icon.png" width="20" height="20" /></a>},
+        {name: 'Post Date', selector: row => row.datePosted, sortable: true, sortFunction: dateSort, width: '150px'},
+        {name: 'Top Image', selector: row => row.image, width: '200px', cell: (data) => <img alt="" src={'https://s3.us-west-1.amazonaws.com/bronze-giant-social-archive/' + data.id + '.jpg'} width="100" height="100" style={{marginTop: '3px', borderRadius: '10px'}}/> },
+        {name: 'Content', selector: row => row.content, width: '600px'}];
 
     function handleChange(event) {
         setHashtag(event.target.value);
@@ -118,7 +118,7 @@ function App() {
                     setIsLoading(false);
                 });
         }catch(error){
-            console.log(`fetch ERROR: ${JSON.stringify(error)}`);
+          console.log(`fetch ERROR: ${JSON.stringify(error)}`);
         }
     }
 
