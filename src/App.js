@@ -3,6 +3,8 @@ import { FacebookLoginButton} from "react-social-login-buttons";
 import axios from 'axios';
 import {useState, useEffect} from "react";
 import StorageIcon from '@mui/icons-material/Storage';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import 'react-tabs/style/react-tabs.css';
 
 import './App.css';
 import {PostTableComponent} from "./PostTableComponent";
@@ -102,7 +104,7 @@ function App() {
         const newPostsData = [];
         try {
             axios.get(`http://localhost:3001/social-archive/facebook/posts?userId=${profile.id}&hashtag=${hashtag}`
-                )
+            )
                 .then(res => {
                     res.data.forEach((doc) => {
 
@@ -118,7 +120,7 @@ function App() {
                     setIsLoading(false);
                 });
         }catch(error){
-          console.log(`fetch ERROR: ${JSON.stringify(error)}`);
+            console.log(`fetch ERROR: ${JSON.stringify(error)}`);
         }
     }
 
@@ -126,81 +128,94 @@ function App() {
         setPostsData([]);
     }
 
-  return (
-      <div>
-          <div id="overlay">Loading...</div>
-          <div style={{margin : 10, fontStyle: 'bold', color: 'green', float: 'left'}}>
-              <table><tbody><tr><td><StorageIcon/></td><td><h4>My Social Archive</h4></td></tr></tbody></table>
-          </div>
-          <hr width="98%" color="green" size="1px" />
-          <div>
-              { !profile ?
-              <LoginSocialFacebook
-                  appId={APP_ID}
-                  version="v18.0"
-                  scope='user_posts'
-                  onReject={(error) => {
-                      console.log('ERROR:' + error);
-                  }}
-                  onResolve={(response) => {
-                      setProfile(response.data);
-              }}>
-              <FacebookLoginButton/>
-          </LoginSocialFacebook>: ''}
+    return (
+        <div>
+            <div id="overlay">Loading...</div>
+            <div style={{margin : 10, fontStyle: 'bold', color: 'green', float: 'left'}}>
+                <table><tbody><tr><td><StorageIcon/></td><td><h4>My Social Archive</h4></td></tr></tbody></table>
+            </div>
+            <hr width="98%" color="green" size="1px" />
+            <div>
+                { !profile ?
+                    <LoginSocialFacebook
+                        appId={APP_ID}
+                        version="v18.0"
+                        scope='user_posts'
+                        onReject={(error) => {
+                            console.log('ERROR:' + error);
+                        }}
+                        onResolve={(response) => {
+                            setProfile(response.data);
+                        }}>
+                        <FacebookLoginButton/>
+                    </LoginSocialFacebook>: ''}
 
-              {profile ? <div>
-                  <table style={{margin : 10}}>
-                      <tbody>
-                          <tr>
-                              <td><img alt='' src={pictureUrl} /></td>
-                              <td>
-                                  <table style={{margin : 10}}>
-                                      <tbody>
-                                          <tr><td><h3>{profile.name}</h3></td></tr>
-                                          <tr><td>User {profile.id}</td></tr>
-                                      </tbody>
-                                  </table>
-                              </td>
-                          </tr>
-                      </tbody>
-                  </table>
-                  <label style={{margin : 10, color: 'darkgreen'}} htmlFor="hashtag-filter">Hashtag Filter: #</label>
-                  <input type='text' id='hashtag-filter' onChange={handleChange} />
-                  <label style={{margin : 10, color: 'darkgreen'}} htmlFor="years">Oldest:</label>
-                  <select name="years" id="years" style={{width: 55}} defaultValue={2024}>
-                      <option value="2013">2013</option>
-                      <option value="2014">2014</option>
-                      <option value="2015">2015</option>
-                      <option value="2016">2016</option>
-                      <option value="2017">2017</option>
-                      <option value="2018">2018</option>
-                      <option value="2019">2019</option>
-                      <option value="2020">2020</option>
-                      <option value="2021">2021</option>
-                      <option value="2022">2022</option>
-                      <option value="2023">2023</option>
-                      <option value="2024">2024</option>
-                  </select>
-                  <button style={{marginLeft : 30, marginTop: 30, color: 'darkgreen'}} onClick={archiveFacebookData}>
-                      Archive
-                  </button>
-                 <button style={{marginLeft : 30, marginTop: 30, color: 'darkgreen'}} onClick={getFacebookData} disabled={isLoading}>
-                      View All
-                  </button>
-                  <button style={{marginLeft : 30, marginTop: 30, color: 'darkgreen'}} onClick={clearFacebookData}>
-                      Clear
-                  </button>
+                {profile ? <div>
+                    <table style={{margin : 10}}>
+                        <tbody>
+                        <tr>
+                            <td><img alt='' src={pictureUrl} /></td>
+                            <td>
+                                <table style={{margin : 10}}>
+                                    <tbody>
+                                    <tr><td><h3>{profile.name}</h3></td></tr>
+                                    <tr><td>User {profile.id}</td></tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <Tabs>
+                        <TabList>
+                            <Tab>Archive</Tab>
+                            <Tab>View</Tab>
+                        </TabList>
 
-              </div>: (<h5 style={{marginLeft: 10, fontStyle: 'italic', color: 'gray'}}>No Profile</h5>)}
-              <PostTableComponent
-                  columns={COLUMNS}
-                  hashtag={hashtag}
-                  data={postsData}
-                  selectableRows
-              />
-          </div>
-      </div>
-  );
+                        <TabPanel>
+                            <label style={{margin : 10, color: 'darkgreen'}} htmlFor="hashtag-filter">Hashtag Filter: #</label>
+                            <input type='text' id='hashtag-filter' onChange={handleChange} />
+                            <label style={{margin : 10, color: 'darkgreen'}} htmlFor="years">Oldest:</label>
+                            <select name="years" id="years" style={{width: 55}} defaultValue={2024}>
+                                <option value="2013">2013</option>
+                                <option value="2014">2014</option>
+                                <option value="2015">2015</option>
+                                <option value="2016">2016</option>
+                                <option value="2017">2017</option>
+                                <option value="2018">2018</option>
+                                <option value="2019">2019</option>
+                                <option value="2020">2020</option>
+                                <option value="2021">2021</option>
+                                <option value="2022">2022</option>
+                                <option value="2023">2023</option>
+                                <option value="2024">2024</option>
+                            </select>
+                            <button style={{marginLeft : 30, marginTop: 30, color: 'darkgreen'}} onClick={archiveFacebookData}>
+                                Archive
+                            </button>
+                        </TabPanel>
+                        <TabPanel>
+                            <label style={{margin : 10, color: 'darkgreen'}} htmlFor="hashtag-filter">Hashtag Filter: #</label>
+                            <input type='text' id='hashtag-filter' onChange={handleChange} />
+                            <button style={{marginLeft : 30, marginTop: 30, color: 'darkgreen'}} onClick={getFacebookData} disabled={isLoading}>
+                                View All
+                            </button>
+                            <button style={{marginLeft : 30, marginTop: 30, color: 'darkgreen'}} onClick={clearFacebookData}>
+                                Clear
+                            </button>
+                            <PostTableComponent
+                                columns={COLUMNS}
+                                hashtag={hashtag}
+                                data={postsData}
+                                selectableRows
+                            />
+                        </TabPanel>
+                    </Tabs>
+                </div>: (<h5 style={{marginLeft: 10, fontStyle: 'italic', color: 'gray'}}>No Profile</h5>)}
+
+            </div>
+        </div>
+    );
 }
 
 export default App;

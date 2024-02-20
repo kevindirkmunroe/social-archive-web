@@ -24,6 +24,7 @@
     "react-scripts": "5.0.1",
     "react-social-login-buttons": "^3.9.1",
     "react-table": "^7.8.0",
+    "react-tabs": "^6.0.2",
     "reactjs-social-login": "^2.6.3",
     "web-vitals": "^2.1.4"
   },
