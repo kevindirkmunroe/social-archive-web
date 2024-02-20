@@ -25,11 +25,6 @@ export function PostTableComponent(props){
                 )
         }
 
-        const handleChange = ({ selectedRows }) => {
-                // You can set state or dispatch with something like Redux so we can use the retrieved data
-                console.log('Selected Rows: ', selectedRows);
-        };
-
         const handleRowClicked = (row, event) => {
                 console.log(`row = ${JSON.stringify(row)}`);
                 toggleModal();
@@ -41,15 +36,14 @@ export function PostTableComponent(props){
         }
 
         return (
-            <div>{props.data.length > 0? <h3 style={{marginLeft: '10px'}}>{props.data.length} {singularOrPlural(props.data.length)} for "#{props.hashtag}"</h3> : <h3 style={{height: '22px'}}> </h3>}
+            <div>{props.data.length > 0? <h3 style={{marginLeft: '20px'}}>{props.data.length} {singularOrPlural(props.data.length)} for "#{props.hashtag}"</h3> : <h3 style={{height: '22px'}}> </h3>}
                 <hr width="98%" color="green" size="2px" />
                 <DataTable
                     pagination
                     columns={props.columns}
                     data={props.data}
-                    selectableRows={true}
+                    selectableRows={false}
                     selectableRowsNoSelectAll={false}
-                    onSelectedRowsChange={handleChange}
                     onRowClicked={(row, event) => handleRowClicked(row, event)}
                 />
                 <Modal
@@ -58,7 +52,7 @@ export function PostTableComponent(props){
                         contentLabel="My dialog"
                         className="mymodal"
                         overlayClassName="myoverlay"
-                        closeTimeoutMS={500}
+                        closeTimeoutMS={200}
                 >
                     <OnePost/><p/>
                     <button onClick={toggleModal}>Close</button>
