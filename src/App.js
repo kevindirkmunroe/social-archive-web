@@ -166,7 +166,7 @@ function App() {
                         </tr>
                         </tbody>
                     </table>
-                    <Tabs>
+                    <Tabs style={{marginLeft: '12px'}}>
                         <TabList>
                             <Tab>Archive</Tab>
                             <Tab>View</Tab>
@@ -200,9 +200,12 @@ function App() {
                             <button style={{marginLeft : 30, marginTop: 30, color: 'darkgreen'}} onClick={getFacebookData} disabled={isLoading}>
                                 View All
                             </button>
-                            <button style={{marginLeft : 30, marginTop: 30, color: 'darkgreen'}} onClick={clearFacebookData}>
+                            <button style={{marginLeft : 30, marginTop: 30, marginRight: '20px', color: 'darkgreen'}} onClick={clearFacebookData}>
                                 Clear
                             </button>
+                            <div style={{marginTop: '10px', marginLeft: '10px', verticalAlign: 'top'}}>
+                                <div><a href={'http://localhost:3002?user=' + profile.name + '&userId=' + profile.id} target="_blank">Go To Gallery</a></div>
+                            </div>
                             <PostTableComponent
                                 columns={COLUMNS}
                                 hashtag={hashtag}

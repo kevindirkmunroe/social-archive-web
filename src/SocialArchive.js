@@ -1,3 +1,4 @@
+import 'dotenv/config.js';
 import {Component} from "react";
 import StorageIcon from "@mui/icons-material/Storage";
 import {LoginSocialFacebook} from "reactjs-social-login";
@@ -6,8 +7,12 @@ import axios from "axios";
 import {ThreeDots} from "react-loader-spinner";
 import { LoadingButton } from '@mui/lab';
 
+const HOST = process.env.SOCIAL_ARCHIVE_HOST;
+const PORT = process.env.SOCIAL_ARCHIVE_PORT;
+const APP_ID = process.env.SOCIAL_ARCHIVE_APP_ID;
+const FACEBOOK_APP_VERSION = process.env.FACEBOOK_APP_VERSION;
+
 class SocialArchive extends Component {
-    static APP_ID = '387900606919443';
     constructor(props) {
         super(props);
 
@@ -29,7 +34,7 @@ class SocialArchive extends Component {
         const oldestYear =  document.getElementById("years").value;
 
         try {
-            axios.post(`http://localhost:3001/social-archive`,
+            axios.post(`http://${HOST}:${PORT}/social-archive`,
                 { id: userId, accessToken: userAccessToken, hashtag: this.state.hashtag, oldestYear})
                 .then(res => {
                     console.log(`ARCHIVE OK: ${JSON.stringify(res)}`);
@@ -45,7 +50,7 @@ class SocialArchive extends Component {
     async getFacebookData(){
         this.setState({isLoading: true});
         try {
-            axios.get(`http://localhost:3001/social-archive/facebook/posts?userId=${this.state.profile.id}&hashtag=${this.state.hashtag}`
+            axios.get(`http://${HOST}:${PORT}/social-archive/facebook/posts?userId=${this.state.profile.id}&hashtag=${this.state.hashtag}`
             )
                 .then(res => {
                     let posts = '<h2 style="color: darkgreen">Posts</h2><hr width="100%" color="green" size="2px" /><div style="overflow-y:scroll; height:400px"><table><tbody>'
@@ -102,8 +107,8 @@ class SocialArchive extends Component {
                 <div>
                     { !this.state.profile ?
                         <LoginSocialFacebook
-                            appId={SocialArchive.APP_ID}
-                            version="v18.0"
+                            appId={APP_ID}
+                            version={FACEBOOK_APP_VERSION}
                             scope='user_posts'
                             onReject={(error) => {
                                 console.log('ERROR:' + error);
@@ -161,6 +166,9 @@ class SocialArchive extends Component {
                         </LoadingButton>
                         <button style={{marginLeft : 30, marginTop: 30, color: 'darkgreen'}} onClick={this.clearFacebookData}>
                             Clear
+                        </button>
+                        <button style={{marginLeft : 30, marginTop: 30, color: 'darkgreen'}}>
+                            Go To Gallery
                         </button>
 
                     </div>: (<h5 style={{marginLeft: 10, fontStyle: 'italic', color: 'gray'}}>No Profile</h5>)}
