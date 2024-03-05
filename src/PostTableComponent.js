@@ -36,7 +36,7 @@ export function PostTableComponent(props){
         }
 
         return (
-            <div>{props.data.length > 0? <h3 style={{marginLeft: '20px'}}>{props.data.length} {singularOrPlural(props.data.length)} for "#{props.hashtag}"</h3> : <h3 style={{height: '22px'}}> </h3>}
+            <div>{props.data.length > 0? <h3 style={{marginLeft: '10px'}}>{props.data.length} {singularOrPlural(props.data.length)} for "#{props.hashtag}"</h3> : <h3 style={{height: '22px'}}> </h3>}
                 <hr width="98%" color="green" size="2px" />
                 <DataTable
                     pagination

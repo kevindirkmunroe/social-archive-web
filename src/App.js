@@ -41,6 +41,11 @@ function App() {
         setPostsData(postsData);
     }, [postsData])
 
+    const [deletedHashtag, setDeletedHashtag] = useState([]);
+    useEffect(() => {
+        setDeletedHashtag(deletedHashtag);
+    }, [deletedHashtag])
+
     const [isLoading, setIsLoading] = useState(false);
     const [isArchiving, setIsArchiving] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
@@ -66,11 +71,32 @@ function App() {
 
     function handleChange(event) {
         setHashtag(event.target.value);
+        setDeletedHashtag(event.target.value);
     }
 
     const handleDialogClose = () => {
         setSelectedItem(null);
     };
+
+    const handleDelete = (event) => {
+        setDeletedHashtag(event.target.value);
+    }
+
+    const deleteHashtag = () => {
+        const { id: userId } = profile;
+        try {
+            axios.post(`http://localhost:3001/social-archive/facebook/delete`,
+                { id: userId, hashtag: deletedHashtag})
+                .then(res => {
+                    console.log(`ARCHIVE DELETE OK: ${JSON.stringify(res)}`);
+                })
+                .catch((error) => {
+                    console.log(`ARCHIVE DELETE ERROR: ${JSON.stringify(error)}`);
+                });
+        }catch(error){
+            console.log(`delete ERROR: ${JSON.stringify(error)}`);
+        }
+    }
 
     const cropText = (text) => {
         if( text.length > 400){
@@ -160,6 +186,13 @@ function App() {
                                     <tbody>
                                     <tr><td><h3>{profile.name}</h3></td></tr>
                                     <tr><td>User {profile.id}</td></tr>
+                                    <tr>
+                                        <td>
+                                            <div style={{marginTop: '10px', verticalAlign: 'top'}}>
+                                                <div><img src={'./icons8-gallery-24.png'} width={'18px'} height={'18px'}/>&nbsp;<a href={'http://localhost:3002?user=' + profile.name + '&userId=' + profile.id} target="_blank" style={{verticalAlign: 'top'}}>Go To Gallery</a></div>
+                                            </div>
+                                        </td>
+                                    </tr>
                                     </tbody>
                                 </table>
                             </td>
@@ -170,6 +203,7 @@ function App() {
                         <TabList>
                             <Tab>Archive</Tab>
                             <Tab>View</Tab>
+                            <Tab>Edit</Tab>
                         </TabList>
 
                         <TabPanel>
@@ -203,15 +237,19 @@ function App() {
                             <button style={{marginLeft : 30, marginTop: 30, marginRight: '20px', color: 'darkgreen'}} onClick={clearFacebookData}>
                                 Clear
                             </button>
-                            <div style={{marginTop: '10px', marginLeft: '10px', verticalAlign: 'top'}}>
-                                <div><a href={'http://localhost:3002?user=' + profile.name + '&userId=' + profile.id} target="_blank">Go To Gallery</a></div>
-                            </div>
                             <PostTableComponent
                                 columns={COLUMNS}
                                 hashtag={hashtag}
                                 data={postsData}
                                 selectableRows
                             />
+                        </TabPanel>
+                        <TabPanel>
+                            <label style={{margin : 10, color: 'darkgreen'}} htmlFor="hashtag-filter">Hashtag Filter: #</label>
+                            <input type='text' id='hashtag-filter' onChange={handleDelete} />
+                            <button style={{marginLeft : 30, marginTop: 30, marginRight: '20px', color: 'darkgreen'}} onClick={deleteHashtag}>
+                                Delete
+                            </button>
                         </TabPanel>
                     </Tabs>
                 </div>: (<h5 style={{marginLeft: 10, fontStyle: 'italic', color: 'gray'}}>No Profile</h5>)}
