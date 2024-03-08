@@ -116,3 +116,67 @@ ul.nav li.active {
 .hoverTable tr:hover {
   background-color: #cefad0;
 }
+
+html,
+body {
+  padding: 5;
+  margin: 5;
+}
+
+.parent {
+  height: 90vh;
+  display: grid;
+  grid: auto 1fr auto / 300px 1fr 50px;
+  font-family: Verdana;
+  font-weight: 00;
+}
+
+header,
+footer,
+.left-sidebar,
+main,
+.right-sidebar {
+  padding: 10px;
+}
+
+header {
+  grid-column: 1 / 4;
+  background-color: white;
+}
+
+.left-sidebar {
+  grid-column: 1 / 2;
+  background-color: white;
+}
+
+main {
+  grid-column: 2 / 3;
+  background-color: #F2F3F3;
+  border-width: thick;
+  border-color: lightgray;
+}
+
+.right-sidebar {
+  grid-column: 3 / 4;
+  background-color: white;
+}
+
+footer {
+  grid-column: 1 / 4;
+  background-color: darkgreen;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .parent {
+    grid: repeat(5, 1fr) / 1fr;
+  }
+
+  header,
+  footer,
+  .left-sidebar,
+  main,
+  .right-sidebar {
+    grid-column: 1 / 2;
+  }
+}
