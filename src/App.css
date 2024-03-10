@@ -167,6 +167,11 @@ footer {
   color: white;
 }
 
+.hashtag:hover {
+  background-color: #e5e5e5;
+  color: #000000;
+}
+
 @media (max-width: 768px) {
   .parent {
     grid: repeat(5, 1fr) / 1fr;

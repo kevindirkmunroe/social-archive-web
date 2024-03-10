@@ -35,9 +35,12 @@ export function PostTableComponent(props){
             return resultSize === 1? 'Result' : 'Results'
         }
 
-        return (
+    // TODO: add selectableRows attribute to DataTable
+
+
+    return (
             <div>{props.data.length > 0? <h3 style={{marginLeft: '10px'}}>{props.data.length} {singularOrPlural(props.data.length)} for "#{props.hashtag}"</h3> : <h3 style={{height: '22px'}}> </h3>}
-                <hr width="98%" color="green" size="2px" />
+                <hr width="100%" color="green" size="2px" />
                     <div style={{overflow: 'scroll', height: '300px'}}>
                         <DataTable
                         pagination
@@ -45,8 +48,6 @@ export function PostTableComponent(props){
                         data={props.data}
                         dense={true}
                         persistTableHead={true}
-                        selectableRows
-                        selectableRowsNoSelectAll={false}
                         onRowClicked={(row, event) => handleRowClicked(row, event)}
                     />
                     <Modal

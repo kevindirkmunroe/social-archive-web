@@ -31,11 +31,16 @@ function App() {
         }
     }, [profile]);
 
+    // For UI form change
     const [hashtag, setHashtag] = useState('');
     useEffect(() => {
         setHashtag(hashtag);
     }, [hashtag]);
 
+    // All archived hashtags upon UI loadup
+    const [hashtags, setHashtags] = useState([]);
+
+    // Posts for one hashtag
     const [postsData, setPostsData] = useState([]);
     useEffect(() => {
         setPostsData(postsData);
@@ -47,7 +52,6 @@ function App() {
     }, [deletedHashtag])
 
     const [isLoading, setIsLoading] = useState(false);
-    const [hashtags, setHashtags] = useState([]);
 
     if(hashtags.length === 0) {
         try {
@@ -66,17 +70,17 @@ function App() {
     }
 
     const trimHashtagLengthForDisplay = (hashtag) => {
-        return hashtag.length > 15 ? hashtag.substring(0, 12) + '...' : hashtag;
+        return hashtag.length > 18 ? hashtag.substring(0, 12) + '...' : hashtag;
     }
 
-    const encodeSpaces = (string) => {
+    const encodeSpacesForMail = (string) => {
         return string.replaceAll(' ', '%25%32%30');
     }
 
     function shareHashtag(hashtag){
-        const profileName = encodeSpaces(profile.name);
+        const profileName = encodeSpacesForMail(profile.name);
         console.log(`profileName=${profileName}`);
-        window.open(`mailto:myfriend@example.com?subject=Check out these awesome pics from ${profile.name}'s My Social Archive Gallery!&body=Enjoy!%0A%0A%2D%2DThe My Social Archive Team%0A%0AClick Here: http://localhost:3002?userId=${profile.id}%26user=${encodeSpaces(profile.name)}%26hashtag=${encodeURIComponent(hashtag)}`);
+        window.open(`mailto:myfriend@example.com?subject=Check out these awesome pics from ${profile.name}'s My Social Archive Gallery!&body=Enjoy!%0A%0A%2D%2DThe My Social Archive Team%0A%0AClick Here: http://localhost:3002?id=${hashtag.shareableId}`);
     }
 
     const dateSort = (rowA, rowB) => {
@@ -93,7 +97,7 @@ function App() {
         return 0;
     }
 
-    const COLUMNS = [{name: 'Link', selector: row => row.originalPost, marginLeft: '50px', width: '60px', cell: (data) => <a href={'https://www.facebook.com/' + data.id} target="_blank" rel="noreferrer"><img alt="Facebook" src="./facebook-16x16-icon.png" width="20" height="20" /></a>},
+    const COLUMNS = [{name: 'Link', selector: row => row.originalPost, marginLeft: '50px', width: '60px', cell: (data) => <a href={'https://www.facebook.com/' + data.id} target="_blank" rel="noreferrer"><div style={{display: 'flex'}}><img alt="Facebook" src="./facebook-16x16-icon.png" style={{width: '20px', height: '20px', borderRadius: '3px'}} /><img alt="Facebook" src="./icons8-link-50.png" style={{width: '20px', height: '20px', borderRadius: '3px'}} /></div></a>},
         {name: 'Post Date', selector: row => row.datePosted, sortable: true, sortFunction: dateSort, width: '150px'},
         {name: 'Top Image', selector: row => row.image, width: '200px', cell: (data) => <img alt="" src={'https://s3.us-west-1.amazonaws.com/bronze-giant-social-archive/' + data.id + '.jpg'} width="100" height="100" style={{marginTop: '3px', borderRadius: '10px'}}/> },
         {name: 'Content', selector: row => row.content, width: '600px'}];
@@ -109,6 +113,7 @@ function App() {
     }
 
     const deleteHashtag = (deletedHashtag) => {
+        alert(`here for ${JSON.stringify(deletedHashtag)}`);
         const { id: userId } = profile;
         try {
             axios.post(`http://localhost:3001/social-archive/facebook/delete`,
@@ -132,12 +137,12 @@ function App() {
     }
 
     const archiveFacebookData = async () => {
-        const { id: userId, accessToken: userAccessToken } = profile;
+        const { id: userId, accessToken: userAccessToken, name } = profile;
         const oldestYear =  document.getElementById("years").value;
 
         try {
             axios.post(`http://localhost:3001/social-archive/save`,
-                { id: userId, accessToken: userAccessToken, hashtag, oldestYear})
+                { id: userId, userName: name, accessToken: userAccessToken, hashtag, oldestYear})
                 .then(res => {
                     console.log(`ARCHIVE OK: ${JSON.stringify(res)}`);
                 })
@@ -174,6 +179,22 @@ function App() {
         }
     }
 
+    const getShareableHashtagId = async (userId, hashtag) => {
+        try {
+            axios.get(`http://localhost:3001/social-archive/facebook/shareable-hashtag?userId=${profile.id}&hashtag=${hashtag}`
+            )
+                .then(res => {
+                    return res.data;
+                })
+                .catch((error) => {
+                    console.log(`ARCHIVE ERROR: ${JSON.stringify(error)}`);
+                    setIsLoading(false);
+                });
+        }catch(error){
+            console.log(`fetch ERROR: ${JSON.stringify(error)}`);
+        }
+    }
+
     const clearFacebookData = () => {
         setPostsData([]);
     }
@@ -181,7 +202,7 @@ function App() {
     return (
         <div>
             <div style={{margin : 10, fontStyle: 'bold', color: 'green', float: 'left'}}>
-                <table><tbody><tr><td><StorageIcon/></td><td><h4>My Social Archive Admin</h4></td></tr></tbody></table>
+                <table><tbody><tr><td><img src={'./black-cat.png'} width={'20px'} height={'20px'}/></td><td><h4>&nbsp;My Social Archivr</h4></td><td></td></tr></tbody></table>
             </div>
             <hr width="98%" color="green" size="1px" />
             <div className="parent">
@@ -213,7 +234,7 @@ function App() {
                                             <table style={{margin : 10}}>
                                                 <tbody>
                                                 <tr><td><h3>{profile.name}</h3></td></tr>
-                                                <tr><td style={{marginTop: 'opx'}}><div style={{float: 'top'}}><img alt="Facebook" src="./facebook-16x16-icon.png" width="16" height="16" />&nbsp;User {profile.id}</div></td></tr>
+                                                <tr><td style={{marginTop: 'opx'}}><div style={{float: 'top'}}><img alt="Facebook" src="./facebook-black.png" width="16" height="16" />&nbsp;User {profile.id}</div></td></tr>
                                                 </tbody>
                                             </table>
                                         </td>
@@ -228,19 +249,19 @@ function App() {
 
                     <section className="left-sidebar">
                         { profile ?
-                            <table style={{verticalAlign: 'top', minWidth: '300px', borderTop: '0px'}}>
+                            <table style={{verticalAlign: 'top'}}>
                             <tbody>
                             <tr>
                                 <td>
-                                    <table className="table table-hover" style={{tableLayout: 'fixed', textAlign: 'left', height: '20px', borderRight: 'none', borderLeft: 'none', borderCollapse: 'collapse', marginBottom: '20px', overflow: 'hidden', marginLeft: '10px' }}>
+                                    <table className="table table-hover" style={{width: '100%', textAlign: 'left', height: '20px', borderRight: 'none', borderLeft: 'none', borderCollapse: 'collapse', marginBottom: '20px', overflow: 'hidden', marginLeft: '10px' }}>
                                         <tbody>
                                         <tr>
                                             <td colSpan={5}>
                                                 <div style={{textAlign: 'left'}}><b>{hashtags.length}</b> Archived {singularOrPlural(hashtags.length)}</div>
                                             </td>
                                         </tr>
-                                        <tr><td colSpan={4}><hr/></td></tr>
-                                        {hashtags ? hashtags.length > 0 && hashtags.map((item) => <tr><td style={{textAlign: 'left', width: '25px', height: '25px'}} key={item}><img alt="Facebook" src="./facebook-16x16-icon.png" width="16" height="16" /></td><td id={item} onClick={handleGetHashtagButtonClicked}>#{trimHashtagLengthForDisplay(item)}<div style={{float: 'right'}}>&nbsp;&nbsp;&nbsp;<a href={'http://localhost:3002?user=' + profile.name + '&userId=' + profile.id + '&hashtag=' + encodeURIComponent(item)} target="_blank" style={{verticalAlign: 'top'}} rel="noreferrer"><img src={'./icons8-gallery-24.png'} width={'16px'} height={'16px'}/></a><img onClick={() => shareHashtag(item)} alt="Share" src="./export-share-icon.png" width="14" height-="14" style={{marginLeft: '5px'}} /><img onClick={(item) => deleteHashtag(item)} alt="Share" src="./icons8-trash-24.png" width="16" height-="16" style={{marginLeft: '5px'}} /></div></td></tr>) : <tr><td>No Data</td></tr>}
+                                        <tr><td colSpan={7}><hr/></td></tr>
+                                        {hashtags ? hashtags.length > 0 && hashtags.map((item) => <tr><td colSpan={5} id={item.shareableId} className="hashtag" onClick={handleGetHashtagButtonClicked} style={{textAlign: 'left', width: '40px', height: '25px'}} key={item}><img alt="Facebook" src="./facebook-black.png" width="16" height="16" />{item.shareableId}: #{trimHashtagLengthForDisplay(item.hashtag)}</td><td><div style={{float: 'right'}}>&nbsp;&nbsp;&nbsp;<a href={'http://localhost:3002?id=' + item.shareableId} target="_blank" style={{verticalAlign: 'top'}} rel="noreferrer"><img src={'./icons8-gallery-24.png'} width={'16px'} height={'16px'}/></a><img onClick={() => shareHashtag(item)} alt="Share" src="./export-share-icon.png" width="14" height-="14" style={{marginLeft: '5px'}} /><img onClick={() => deleteHashtag(item.hashtag)} alt="Share" src="./icons8-trash-24.png" width="16" height-="16" style={{marginLeft: '5px'}} /></div></td></tr>) : <tr><td>No Data</td></tr>}
                                         </tbody>
                                     </table>
                                 </td>
@@ -257,14 +278,14 @@ function App() {
                             <Tabs style={{marginLeft: '12px', borderLeft: '1px', width: '100%'}}>
                                 <TabList>
                                     <Tab>View</Tab>
-                                    <Tab>Archive</Tab>
+                                    <Tab><img src={'./storage_black_24dp.svg'} style={{verticalAlign: 'bottom', width: '16px', height: '16px'}}/>&nbsp;Archive</Tab>
                                 </TabList>
                                 <TabPanel>
                                     <div style={{overflow: 'scroll', height: '400px'}}>
-                                        <label style={{margin : 10, color: 'darkgreen'}} htmlFor="hashtag-filter">Filter</label>
+                                        <label style={{margin : 10, color: 'darkgreen'}} htmlFor="hashtag-filter">Hashtag</label>
                                         <input type='text' id='hashtag-filter' onChange={handleChange} />
                                         <button style={{marginLeft : 30, marginTop: 30, color: 'darkgreen'}} onClick={getFacebookData} disabled={isLoading}>
-                                            View All
+                                            Search
                                         </button>
                                         <button style={{marginLeft : 30, marginTop: 30, marginRight: '20px', color: 'darkgreen'}} onClick={clearFacebookData}>
                                             Clear
@@ -278,7 +299,7 @@ function App() {
                                     </div>
                                 </TabPanel>
                                 <TabPanel>
-                                    <label style={{margin : 10, color: 'darkgreen'}} htmlFor="hashtag-filter">Hashtag #</label>
+                                    <label style={{margin : 10, color: 'darkgreen'}} htmlFor="hashtag-filter">Hashtag</label>
                                     <input type='text' id='hashtag-filter' onChange={handleChange} />
                                     <label style={{margin : 10, color: 'darkgreen'}} htmlFor="years">Oldest Year</label>
                                     <select name="years" id="years" style={{width: 55}} defaultValue={2024}>
@@ -309,7 +330,7 @@ function App() {
                 <aside className="right-sidebar">
                     <img alt="Info" src="./icons8-info-50.png" style={{width: '24px', height: '24px'}} />
                 </aside>
-                <footer style={{textAlign: 'right'}}>© 2024, Bronze Giant LLC</footer>
+                <footer style={{textAlign: 'right'}}>© 2024 Bronze Giant LLC</footer>
             </div>
         </div>
     );
