@@ -2,7 +2,6 @@ import { LoginSocialFacebook} from "reactjs-social-login";
 import { FacebookLoginButton} from "react-social-login-buttons";
 import axios from 'axios';
 import {useState, useEffect} from "react";
-import StorageIcon from '@mui/icons-material/Storage';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 
@@ -55,13 +54,13 @@ function App() {
 
     if(hashtags.length === 0) {
         try {
-            axios.get(`http://localhost:3001/social-archive/facebook/hashtags`
+            axios.get(`http://localhost:3001/social-archive/facebook/hashtags?userId=${profile.id}`
             ).then(res => {
-                console.log(`[SocialArchiveViewer] set hashtags: ${res.data}`);
+                console.log(`[SocialArchiveWeb] set hashtags: ${JSON.stringify(res.data)}`);
                 setHashtags(res.data);
             });
         } catch (err) {
-            console.log(`[SocialArchiveViewer] error retrieving hashtags: ${err}`);
+            console.log(`[SocialArchiveWeb] error retrieving hashtags: ${err}`);
         }
     }
 
@@ -261,7 +260,7 @@ function App() {
                                             </td>
                                         </tr>
                                         <tr><td colSpan={7}><hr/></td></tr>
-                                        {hashtags ? hashtags.length > 0 && hashtags.map((item) => <tr><td colSpan={5} id={item.shareableId} className="hashtag" onClick={handleGetHashtagButtonClicked} style={{textAlign: 'left', width: '40px', height: '25px'}} key={item}><img alt="Facebook" src="./facebook-black.png" width="16" height="16" />{item.shareableId}: #{trimHashtagLengthForDisplay(item.hashtag)}</td><td><div style={{float: 'right'}}>&nbsp;&nbsp;&nbsp;<a href={'http://localhost:3002?id=' + item.shareableId} target="_blank" style={{verticalAlign: 'top'}} rel="noreferrer"><img src={'./icons8-gallery-24.png'} width={'16px'} height={'16px'}/></a><img onClick={() => shareHashtag(item)} alt="Share" src="./export-share-icon.png" width="14" height-="14" style={{marginLeft: '5px'}} /><img onClick={() => deleteHashtag(item.hashtag)} alt="Share" src="./icons8-trash-24.png" width="16" height-="16" style={{marginLeft: '5px'}} /></div></td></tr>) : <tr><td>No Data</td></tr>}
+                                        {hashtags ? hashtags.length > 0 && hashtags.map((item) => <tr><td colSpan={5} id={item.shareableId} className="hashtag" onClick={handleGetHashtagButtonClicked} style={{textAlign: 'left', width: '40px', height: '25px'}} key={item}><img alt="Facebook" src="./facebook-black.png" width="16" height="16" />#{trimHashtagLengthForDisplay(item.hashtag.sharedHashtag.hashtag)}</td><td><div style={{float: 'right'}}>&nbsp;&nbsp;&nbsp;<a href={'http://localhost:3002?id=' + item.shareableId} target="_blank" style={{verticalAlign: 'top'}} rel="noreferrer"><img src={'./icons8-gallery-24.png'} width={'16px'} height={'16px'}/></a><img onClick={() => shareHashtag(item)} alt="Share" src="./export-share-icon.png" width="14" height-="14" style={{marginLeft: '5px'}} /><img onClick={() => deleteHashtag(item.hashtag)} alt="Share" src="./icons8-trash-24.png" width="16" height-="16" style={{marginLeft: '5px'}} /></div></td></tr>) : <tr><td>No Data</td></tr>}
                                         </tbody>
                                     </table>
                                 </td>
