@@ -9,9 +9,11 @@ import './App.css';
 import {PostTableComponent} from "./PostTableComponent";
 
 
-
 const APP_ID = '387900606919443';
 function App() {
+
+    const localProcessEnv = { WEB_DOMAIN : 'localhost', SERVICE_DOMAIN: 'localhost', VIEWER_DOMAIN: 'localhost'};
+    const BUILD_ENV = process.env.REACT_APP_BUILD_ENV || localProcessEnv;
 
     function getUserPicture(profileId) {
         return `https://graph.facebook.com/${profileId}/picture?type=large&redirect=true&width=100&height=100`;
@@ -54,7 +56,7 @@ function App() {
 
     if(hashtags.length === 0) {
         try {
-            axios.get(`http://localhost:3001/social-archive/facebook/hashtags?userId=${profile.id}`
+            axios.get(`http://${BUILD_ENV.SERVICE_DOMAIN}:3001/social-archive/facebook/hashtags?userId=${profile.id}`
             ).then(res => {
                 console.log(`[SocialArchiveWeb] set hashtags: ${JSON.stringify(res.data)}`);
                 setHashtags(res.data);
@@ -79,7 +81,7 @@ function App() {
     function shareHashtag(hashtag){
         const profileName = encodeSpacesForMail(profile.name);
         console.log(`profileName=${profileName}`);
-        window.open(`mailto:myfriend@example.com?subject=Check out these awesome pics from ${profile.name}'s My Social Archive Gallery!&body=Enjoy!%0A%0A%2D%2DThe My Social Archive Team%0A%0AClick Here: http://localhost:3002?id=${hashtag.shareableId}`);
+        window.open(`mailto:myfriend@example.com?subject=Check out these awesome pics from ${profile.name}'s My Social Archive Gallery!&body=Enjoy!%0A%0A%2D%2DThe My Social Archive Team%0A%0AClick Here: http://${BUILD_ENV.WEB_DOMAIN}:3002?id=${hashtag.shareableId}`);
     }
 
     const dateSort = (rowA, rowB) => {
@@ -115,7 +117,7 @@ function App() {
         alert(`here for ${JSON.stringify(deletedHashtag)}`);
         const { id: userId } = profile;
         try {
-            axios.post(`http://localhost:3001/social-archive/facebook/delete`,
+            axios.post(`http://${BUILD_ENV.SERVICE_DOMAIN}:3001/social-archive/facebook/delete`,
                 { id: userId, hashtag: deletedHashtag})
                 .then(res => {
                     console.log(`ARCHIVE DELETE OK: ${JSON.stringify(res)}`);
@@ -140,7 +142,7 @@ function App() {
         const oldestYear =  document.getElementById("years").value;
 
         try {
-            axios.post(`http://localhost:3001/social-archive/save`,
+            axios.post(`http://${BUILD_ENV.SERVICE_DOMAIN}:3001/social-archive/save`,
                 { id: userId, userName: name, accessToken: userAccessToken, hashtag, oldestYear})
                 .then(res => {
                     console.log(`ARCHIVE OK: ${JSON.stringify(res)}`);
@@ -157,7 +159,7 @@ function App() {
         setIsLoading(true);
         const newPostsData = [];
         try {
-            axios.get(`http://localhost:3001/social-archive/facebook/posts?userId=${profile.id}&hashtag=${hashtag}`
+            axios.get(`http://${BUILD_ENV.SERVICE_DOMAIN}:3001/social-archive/facebook/posts?userId=${profile.id}&hashtag=${hashtag}`
             )
                 .then(res => {
                     res.data.forEach((doc) => {
@@ -180,7 +182,7 @@ function App() {
 
     const getShareableHashtagId = async (userId, hashtag) => {
         try {
-            axios.get(`http://localhost:3001/social-archive/facebook/shareable-hashtag?userId=${profile.id}&hashtag=${hashtag}`
+            axios.get(`http://${BUILD_ENV.SERVICE_DOMAIN}:3001/social-archive/facebook/shareable-hashtag?userId=${profile.id}&hashtag=${hashtag}`
             )
                 .then(res => {
                     return res.data;
@@ -260,7 +262,7 @@ function App() {
                                             </td>
                                         </tr>
                                         <tr><td colSpan={7}><hr/></td></tr>
-                                        {hashtags ? hashtags.length > 0 && hashtags.map((item) => <tr><td colSpan={5} id={item.shareableId} className="hashtag" onClick={handleGetHashtagButtonClicked} style={{textAlign: 'left', width: '40px', height: '25px'}} key={item}><img alt="Facebook" src="./facebook-black.png" width="16" height="16" />#{trimHashtagLengthForDisplay(item.hashtag.sharedHashtag.hashtag)}</td><td><div style={{float: 'right'}}>&nbsp;&nbsp;&nbsp;<a href={'http://localhost:3002?id=' + item.shareableId} target="_blank" style={{verticalAlign: 'top'}} rel="noreferrer"><img src={'./icons8-gallery-24.png'} width={'16px'} height={'16px'}/></a><img onClick={() => shareHashtag(item)} alt="Share" src="./export-share-icon.png" width="14" height-="14" style={{marginLeft: '5px'}} /><img onClick={() => deleteHashtag(item.hashtag)} alt="Share" src="./icons8-trash-24.png" width="16" height-="16" style={{marginLeft: '5px'}} /></div></td></tr>) : <tr><td>No Data</td></tr>}
+                                        {hashtags ? hashtags.length > 0 && hashtags.map((item) => <tr><td colSpan={5} id={item.shareableId} className="hashtag" onClick={handleGetHashtagButtonClicked} style={{textAlign: 'left', width: '40px', height: '25px'}} key={item}><img alt="Facebook" src="./facebook-black.png" width="16" height="16" />#{trimHashtagLengthForDisplay(item.hashtag.sharedHashtag.hashtag)}</td><td><div style={{float: 'right'}}>&nbsp;&nbsp;&nbsp;<a href={`http://${BUILD_ENV.VIEWER_DOMAIN}:3002?id=` + item.shareableId} target="_blank" style={{verticalAlign: 'top'}} rel="noreferrer"><img src={'./icons8-gallery-24.png'} width={'16px'} height={'16px'}/></a><img onClick={() => shareHashtag(item)} alt="Share" src="./export-share-icon.png" width="14" height-="14" style={{marginLeft: '5px'}} /><img onClick={() => deleteHashtag(item.hashtag)} alt="Share" src="./icons8-trash-24.png" width="16" height-="16" style={{marginLeft: '5px'}} /></div></td></tr>) : <tr><td>No Data</td></tr>}
                                         </tbody>
                                     </table>
                                 </td>
