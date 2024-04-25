@@ -54,12 +54,24 @@ function App() {
 
     const [isLoading, setIsLoading] = useState(false);
 
+    const sortHashtags = (hashtags) => {
+        const compareFn = ((a, b) => {
+            if(a.hashtag.sharedHashtag.hashtag > b.hashtag.sharedHashtag.hashtag){
+                return 1;
+            }else{
+                return -1;
+            }
+        });
+        hashtags.sort(compareFn);
+        return hashtags;
+    }
+
     if(hashtags.length === 0) {
         try {
             axios.get(`http://${BUILD_ENV.SERVICE_DOMAIN}:3001/social-archive/facebook/hashtags?userId=${profile.id}`
             ).then(res => {
                 console.log(`[SocialArchiveWeb] set hashtags: ${JSON.stringify(res.data)}`);
-                setHashtags(res.data);
+                setHashtags(sortHashtags(res.data));
             });
         } catch (err) {
             console.log(`[SocialArchiveWeb] error retrieving hashtags: ${err}`);
@@ -81,7 +93,7 @@ function App() {
     function shareHashtag(hashtag){
         const profileName = encodeSpacesForMail(profile.name);
         console.log(`profileName=${profileName}`);
-        window.open(`mailto:myfriend@example.com?subject=Check out these awesome pics from ${profile.name}'s My Social Archive Gallery!&body=Enjoy!%0A%0A%2D%2DThe My Social Archive Team%0A%0AClick Here: http://${BUILD_ENV.WEB_DOMAIN}:3002?id=${hashtag.shareableId}`);
+        window.open(`mailto:?subject=Check out these awesome pics from ${profile.name}'s My Social Archive Gallery!&body=Enjoy!%0A%0A%2D%2DThe My Social Archive Team%0A%0AFollow this link: http://${BUILD_ENV.WEB_DOMAIN}:3002?id=${hashtag.shareableId}`);
     }
 
     const dateSort = (rowA, rowB) => {
