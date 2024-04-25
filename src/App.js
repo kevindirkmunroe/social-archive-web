@@ -103,14 +103,13 @@ function App() {
         {name: 'Top Image', selector: row => row.image, width: '200px', cell: (data) => <img alt="" src={'https://s3.us-west-1.amazonaws.com/bronze-giant-social-archive/' + data.id + '.jpg'} width="100" height="100" style={{marginTop: '3px', borderRadius: '10px'}}/> },
         {name: 'Content', selector: row => row.content, width: '600px'}];
 
-    function handleChange(event) {
+    async function handleChange(event) {
         setHashtag(event.target.value);
     }
 
     async function handleGetHashtagButtonClicked(event) {
-        // alert(`here with hashtag ${JSON.stringify(event.target.id)}`);
+        await getFacebookData(event.target.id);
         setHashtag(event.target.id);
-        await getFacebookData();
     }
 
     const deleteHashtag = (deletedHashtag) => {
@@ -155,11 +154,11 @@ function App() {
         }
     }
 
-    const getFacebookData = async () => {
+    const getFacebookData = async (newHashtag) => {
         setIsLoading(true);
         const newPostsData = [];
         try {
-            axios.get(`http://${BUILD_ENV.SERVICE_DOMAIN}:3001/social-archive/facebook/posts?userId=${profile.id}&hashtag=${hashtag}`
+            axios.get(`http://${BUILD_ENV.SERVICE_DOMAIN}:3001/social-archive/facebook/posts?userId=${profile.id}&hashtag=${newHashtag || hashtag}`
             )
                 .then(res => {
                     res.data.forEach((doc) => {
@@ -262,7 +261,7 @@ function App() {
                                             </td>
                                         </tr>
                                         <tr><td colSpan={7}><hr/></td></tr>
-                                        {hashtags ? hashtags.length > 0 && hashtags.map((item) => <tr><td colSpan={5} id={item.shareableId} className="hashtag" onClick={handleGetHashtagButtonClicked} style={{textAlign: 'left', width: '40px', height: '25px'}} key={item}><img alt="Facebook" src="./facebook-black.png" width="16" height="16" />#{trimHashtagLengthForDisplay(item.hashtag.sharedHashtag.hashtag)}</td><td><div style={{float: 'right'}}>&nbsp;&nbsp;&nbsp;<a href={`http://${BUILD_ENV.VIEWER_DOMAIN}:3002?id=` + item.shareableId} target="_blank" style={{verticalAlign: 'top'}} rel="noreferrer"><img src={'./icons8-gallery-24.png'} width={'16px'} height={'16px'}/></a><img onClick={() => shareHashtag(item)} alt="Share" src="./export-share-icon.png" width="14" height-="14" style={{marginLeft: '5px'}} /><img onClick={() => deleteHashtag(item.hashtag)} alt="Share" src="./icons8-trash-24.png" width="16" height-="16" style={{marginLeft: '5px'}} /></div></td></tr>) : <tr><td>No Data</td></tr>}
+                                        {hashtags ? hashtags.length > 0 && hashtags.map((item) => <tr><td colSpan={5} id={item.hashtag.sharedHashtag.hashtag} className="hashtag" onClick={handleGetHashtagButtonClicked} style={{textAlign: 'left', width: '40px', height: '25px'}} key={item}><img alt="Facebook" src="./facebook-black.png" width="16" height="16" />&nbsp;#{trimHashtagLengthForDisplay(item.hashtag.sharedHashtag.hashtag)}</td><td><div style={{float: 'right'}}>&nbsp;&nbsp;&nbsp;<a href={`http://${BUILD_ENV.VIEWER_DOMAIN}:3002?id=` + item.shareableId} target="_blank" style={{verticalAlign: 'top'}} rel="noreferrer"><img src={'./icons8-gallery-24.png'} width={'16px'} height={'16px'}/></a><img onClick={() => shareHashtag(item)} alt="Share" src="./export-share-icon.png" width="14" height-="14" style={{marginLeft: '5px'}} /><img onClick={() => deleteHashtag(item.hashtag)} alt="Share" src="./icons8-trash-24.png" width="16" height-="16" style={{marginLeft: '5px'}} /></div></td></tr>) : <tr><td>No Data</td></tr>}
                                         </tbody>
                                     </table>
                                 </td>
@@ -284,7 +283,7 @@ function App() {
                                 <TabPanel>
                                     <div style={{overflow: 'scroll', height: '400px'}}>
                                         <label style={{margin : 10, color: 'darkgreen'}} htmlFor="hashtag-filter">Hashtag</label>
-                                        <input type='text' id='hashtag-filter' onChange={handleChange} />
+                                        <input type='text' id='hashtag-filter' value={hashtag} onChange={handleChange} />
                                         <button style={{marginLeft : 30, marginTop: 30, color: 'darkgreen'}} onClick={getFacebookData} disabled={isLoading}>
                                             Search
                                         </button>
