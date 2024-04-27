@@ -4,6 +4,7 @@ import axios from 'axios';
 import {useState, useEffect} from "react";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
+import {Audio} from 'react-loader-spinner';
 
 import './App.css';
 import {PostTableComponent} from "./PostTableComponent";
@@ -45,14 +46,22 @@ function App() {
     const [postsData, setPostsData] = useState([]);
     useEffect(() => {
         setPostsData(postsData);
-    }, [postsData])
+    }, [postsData]);
 
     const [deletedHashtag, setDeletedHashtag] = useState([]);
     useEffect(() => {
         setDeletedHashtag(deletedHashtag);
-    }, [deletedHashtag])
+    }, [deletedHashtag]);
 
-    const [isLoading, setIsLoading] = useState(false);
+    const [tabIndex, setTabIndex] = useState(0);
+    useEffect(() => {
+        setTabIndex(tabIndex);
+    }, [tabIndex]);
+
+    let isLoading = false;
+    const setIsLoading = (flag) => {
+        isLoading = flag;
+    };
 
     const sortHashtags = (hashtags) => {
         const compareFn = ((a, b) => {
@@ -120,6 +129,7 @@ function App() {
     }
 
     async function handleGetHashtagButtonClicked(event) {
+        setTabIndex(0);
         await getFacebookData(event.target.id);
         setHashtag(event.target.id);
     }
@@ -148,7 +158,17 @@ function App() {
         return text;
     }
 
+    const [isFetching, setIsFetching] = useState(false);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setIsFetching(false)
+        }, 5000);
+    });
+
     const archiveFacebookData = async () => {
+
+        setIsFetching(true);
         const { id: userId, accessToken: userAccessToken, name } = profile;
         const oldestYear =  document.getElementById("years").value;
 
@@ -261,25 +281,27 @@ function App() {
 
                     <section className="left-sidebar">
                         { profile ?
-                            <table style={{verticalAlign: 'top'}}>
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <table className="table table-hover" style={{width: '100%', textAlign: 'left', height: '20px', borderRight: 'none', borderLeft: 'none', borderCollapse: 'collapse', marginBottom: '20px', overflow: 'hidden', marginLeft: '10px' }}>
-                                        <tbody>
-                                        <tr>
-                                            <td colSpan={5}>
-                                                <div style={{textAlign: 'left'}}><b>{hashtags.length}</b> Archived {singularOrPlural(hashtags.length)}</div>
-                                            </td>
-                                        </tr>
-                                        <tr><td colSpan={7}><hr/></td></tr>
-                                        {hashtags ? hashtags.length > 0 && hashtags.map((item) => <tr><td colSpan={5} id={item.hashtag.sharedHashtag.hashtag} className="hashtag" onClick={handleGetHashtagButtonClicked} style={{textAlign: 'left', width: '40px', height: '25px'}} key={item}><img alt="Facebook" src="./facebook-black.png" width="16" height="16" />&nbsp;#{trimHashtagLengthForDisplay(item.hashtag.sharedHashtag.hashtag)}</td><td><div style={{float: 'right'}}>&nbsp;&nbsp;&nbsp;<a href={`http://${BUILD_ENV.VIEWER_DOMAIN}:3002?id=` + item.shareableId} target="_blank" style={{verticalAlign: 'top'}} rel="noreferrer"><img src={'./icons8-gallery-24.png'} width={'16px'} height={'16px'}/></a><img onClick={() => shareHashtag(item)} alt="Share" src="./export-share-icon.png" width="14" height-="14" style={{marginLeft: '5px'}} /><img onClick={() => deleteHashtag(item.hashtag)} alt="Share" src="./icons8-trash-24.png" width="16" height-="16" style={{marginLeft: '5px'}} /></div></td></tr>) : <tr><td>No Data</td></tr>}
-                                        </tbody>
-                                    </table>
-                                </td>
-                            </tr>
-                            </tbody>
-                            </table> : <div style={{verticalAlign: 'top', minWidth: '300px'}}></div> }
+                            <div>
+                                <table style={{verticalAlign: 'top'}}>
+                                <tbody style={{overflow: 'scroll'}}>
+                                <tr>
+                                    <td>
+                                        <table className="table table-hover" style={{width: '100%', textAlign: 'left', height: '20px', borderRight: 'none', borderLeft: 'none', borderCollapse: 'collapse', marginBottom: '20px', overflow: 'hidden', marginLeft: '10px' }}>
+                                            <tbody>
+                                            <tr>
+                                                <td colSpan={5}>
+                                                    <div style={{textAlign: 'left'}}><b>{hashtags.length}</b> Archived {singularOrPlural(hashtags.length)}</div>
+                                                </td>
+                                            </tr>
+                                            <tr><td colSpan={7}><hr/></td></tr>
+                                            {hashtags ? hashtags.length > 0 && hashtags.map((item) => <tr><td colSpan={5} id={item.hashtag.sharedHashtag.hashtag} className="hashtag" onClick={handleGetHashtagButtonClicked} style={{textAlign: 'left', width: '40px', height: '25px'}} key={item}><img alt="Facebook" src="./facebook-black.png" width="16" height="16" />&nbsp;#{trimHashtagLengthForDisplay(item.hashtag.sharedHashtag.hashtag)}</td><td><div style={{float: 'right'}}>&nbsp;&nbsp;&nbsp;<a href={`http://${BUILD_ENV.VIEWER_DOMAIN}:3002?id=` + item.shareableId} target="_blank" style={{verticalAlign: 'top'}} rel="noreferrer"><img src={'./icons8-gallery-24.png'} width={'16px'} height={'16px'}/></a><img onClick={() => shareHashtag(item)} alt="Share" src="./export-share-icon.png" width="14" height-="14" style={{marginLeft: '5px'}} /><img onClick={() => deleteHashtag(item.hashtag)} alt="Share" src="./icons8-trash-24.png" width="16" height-="16" style={{marginLeft: '5px'}} /></div></td></tr>) : <tr><td>No Data</td></tr>}
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                </tbody>
+                                </table>
+                            </div>: <div style={{verticalAlign: 'top', minWidth: '300px'}}></div> }
                     </section>
                     <main>
                         { profile ?
@@ -287,9 +309,9 @@ function App() {
                             <tbody>
                             <tr>
                         <td style={{verticalAlign: 'top'}}>
-                            <Tabs style={{marginLeft: '12px', borderLeft: '1px', width: '100%'}}>
+                            <Tabs selectedIndex={tabIndex} onSelect={(index) => setTabIndex(index)} style={{marginLeft: '12px', borderLeft: '1px', width: '100%'}}>
                                 <TabList>
-                                    <Tab>View</Tab>
+                                    <Tab><img src={'./icons8-search-50.png'} style={{verticalAlign: 'bottom', width: '16px', height: '16px'}}/>&nbsp;Search</Tab>
                                     <Tab><img src={'./storage_black_24dp.svg'} style={{verticalAlign: 'bottom', width: '16px', height: '16px'}}/>&nbsp;Archive</Tab>
                                 </TabList>
                                 <TabPanel>
@@ -331,6 +353,19 @@ function App() {
                                     <button style={{marginLeft : 30, marginTop: 30, color: 'darkgreen'}} onClick={archiveFacebookData}>
                                         Archive
                                     </button>
+                                    { isFetching ?
+                                        <div style={{marginTop: 20}}>
+                                            <Audio
+                                            height="20"
+                                            width="20"
+                                            radius="9"
+                                            color="green"
+                                            ariaLabel="three-dots-loading"
+                                            wrapperStyle
+                                            wrapperClass
+                                            />
+
+                                        </div> : ""}
                                 </TabPanel>
                             </Tabs>
                         </td>
