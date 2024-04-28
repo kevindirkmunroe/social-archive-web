@@ -41,6 +41,9 @@ function App() {
 
     // All archived hashtags upon UI loadup
     const [hashtags, setHashtags] = useState([]);
+    useEffect(() => {
+        setHashtags(hashtags);
+    }, [hashtags]);
 
     // Posts for one hashtag
     const [postsData, setPostsData] = useState([]);
@@ -146,6 +149,11 @@ function App() {
                 .catch((error) => {
                     console.log(`ARCHIVE DELETE ERROR: ${JSON.stringify(error)}`);
                 });
+                const hashtagSet = hashtags;
+                const idx = hashtagSet.indexOf(deletedHashtag);
+                hashtagSet.splice(idx, 1);
+                const newSet = [...hashtagSet];
+                setHashtags(newSet);
         }catch(error){
             console.log(`delete ERROR: ${JSON.stringify(error)}`);
         }
@@ -160,12 +168,6 @@ function App() {
 
     const [isFetching, setIsFetching] = useState(false);
 
-    useEffect(() => {
-        setTimeout(() => {
-            setIsFetching(false)
-        }, 5000);
-    });
-
     const archiveFacebookData = async () => {
 
         setIsFetching(true);
@@ -177,6 +179,7 @@ function App() {
                 { id: userId, userName: name, accessToken: userAccessToken, hashtag, oldestYear})
                 .then(res => {
                     console.log(`ARCHIVE OK: ${JSON.stringify(res)}`);
+
                 })
                 .catch((error) => {
                     console.log(`ARCHIVE ERROR: ${JSON.stringify(error)}`);
@@ -184,6 +187,17 @@ function App() {
         }catch(error){
             console.log(`fetch ERROR: ${JSON.stringify(error)}`);
         }
+
+        try {
+            axios.get(`http://${BUILD_ENV.SERVICE_DOMAIN}:3001/social-archive/facebook/hashtags?userId=${profile.id}`
+            ).then(res => {
+                console.log(`[SocialArchiveWeb] set hashtags: ${JSON.stringify(res.data)}`);
+                setHashtags(sortHashtags(res.data));
+            });
+        } catch (err) {
+            console.log(`[SocialArchiveWeb] error retrieving hashtags: ${err}`);
+        }
+        setIsFetching(false);
     }
 
     const getFacebookData = async (newHashtag) => {
