@@ -192,7 +192,8 @@ function App() {
             axios.get(`http://${BUILD_ENV.SERVICE_DOMAIN}:3001/social-archive/facebook/hashtags?userId=${profile.id}`
             ).then(res => {
                 console.log(`[SocialArchiveWeb] set hashtags: ${JSON.stringify(res.data)}`);
-                setHashtags(sortHashtags(res.data));
+                const newhashtags = res.data;
+                setHashtags(sortHashtags(newhashtags));
             });
         } catch (err) {
             console.log(`[SocialArchiveWeb] error retrieving hashtags: ${err}`);
@@ -280,7 +281,7 @@ function App() {
                                             <table style={{margin : 10}}>
                                                 <tbody>
                                                 <tr><td><h3>{profile.name}</h3></td></tr>
-                                                <tr><td style={{marginTop: 'opx'}}><div style={{float: 'top'}}><img alt="Facebook" src="./facebook-black.png" width="16" height="16" />&nbsp;User {profile.id}</div></td></tr>
+                                                <tr><td style={{marginTop: '0px'}}><div style={{float: 'top'}}><img alt="Facebook" src="./facebook-black.png" width="16" height="16" />&nbsp;User {profile.id}</div></td></tr>
                                                 </tbody>
                                             </table>
                                         </td>
